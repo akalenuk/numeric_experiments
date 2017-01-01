@@ -1,5 +1,6 @@
 #include "../linear_equations.hpp"
-#include "../polynomials.hpp"
+#include "../polynomial_approximation.hpp"
+#include "../polynomial_synthesis.hpp"
 
 #include "html_plotting.hpp"
 
@@ -11,25 +12,25 @@ int main(){
     // polynomial approximation
     auto v = std::vector< std::array<double, 2> > {{2.0, 4.0}, {6.0, 4.0}, {4.0, 2.0}};
     auto x3 = std::array<double, 3>{0};
-    polynoms::approximate<3>(v, linear_equations::semi_static::solve<3>, x3);
-    auto pol = polynoms::make_into_function<3>(x3);
+    polynomial_approximation::approximate<3>(v, linear_equations::semi_static::solve<3>, x3);
+    auto pol = polynomial_approximation::make_into_function<3>(x3);
     assert(pol(0.0) == 10.0);
 
-    // polynomial construction
+    // polynomial synthesis
     auto pa = std::array<std::array<double, 7>, 7> {{0}};
     auto pb = std::array<double, 7> {0};
     auto px = std::array<double, 7> {0};
 
-    pa[0] = polynoms::construction::p<7>(-1.0);            pb[0] = 0.0;
-    pa[1] = polynoms::construction::p<7>(0.0);             pb[1] = 1.0;
-    pa[2] = polynoms::construction::p<7>(1.0);             pb[2] = 0.0;
-    pa[3] = polynoms::construction::dp<7>(-1.0, 1);        pb[3] = 0.0;
-    pa[4] = polynoms::construction::dp<7>(0.0, 1);         pb[4] = 0.0;
-    pa[5] = polynoms::construction::dp<7>(1.0, 1);         pb[5] = 0.0;
-    pa[6] = polynoms::construction::ip<7>(-1.0, 1.0, 1);   pb[6] = 1.0;
+    pa[0] = polynomial_synthesis::p<7>(-1.0);            pb[0] = 0.0;
+    pa[1] = polynomial_synthesis::p<7>(0.0);             pb[1] = 1.0;
+    pa[2] = polynomial_synthesis::p<7>(1.0);             pb[2] = 0.0;
+    pa[3] = polynomial_synthesis::dp<7>(-1.0, 1);        pb[3] = 0.0;
+    pa[4] = polynomial_synthesis::dp<7>(0.0, 1);         pb[4] = 0.0;
+    pa[5] = polynomial_synthesis::dp<7>(1.0, 1);         pb[5] = 0.0;
+    pa[6] = polynomial_synthesis::ip<7>(-1.0, 1.0, 1);   pb[6] = 1.0;
 
     bool le_ok = linear_equations::iterative_projections::solve<7>(pa, pb, px);
-    auto pol2 = polynoms::make_into_function<7>(px);
+    auto pol2 = polynomial_approximation::make_into_function<7>(px);
 
     // plot
     html_plotting::HtmlCanvas<256, 256> canvas;
@@ -47,5 +48,5 @@ int main(){
     fs << html_plotting::wrap_in_limits(html_plotting::table_from_canvas(canvas2), -1.0, 1.0, -1.0, 1.0);
     fs.close();
 
-    std::cout << " + Polynomial approximation and construction is fine." << std::endl;
+    std::cout << " + Polynomial approximation and synthesis are fine." << std::endl;
 }
